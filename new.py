@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import re
 from collections import Counter
+import time
 
 # Set Page Config
 st.set_page_config(page_title="Flipkart Web Scraper", layout="wide")
@@ -42,9 +43,11 @@ if st.session_state["logged_in"]:
 
         for i in range(1, n + 1):
             page_url = f"{url}&page={i}"
-            response = requests.get(page_url, headers=headers)  # Add headers here
-
-            if response.status_code != 200:
+            try:
+                response = requests.get(page_url, headers=headers)
+                response.raise_for_status()  # Raise an error for bad status codes
+            except requests.exceptions.RequestException as e:
+                st.error(f"❌ Error fetching page {i}: {e}")
                 continue
 
             soup = BeautifulSoup(response.text, "lxml")
@@ -69,6 +72,7 @@ if st.session_state["logged_in"]:
                 }
 
                 products.append(product)
+            time.sleep(1)  # Rate limiting to avoid being blocked
 
         if products:
             df = pd.DataFrame(products)
