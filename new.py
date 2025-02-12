@@ -27,13 +27,17 @@ if not st.session_state["logged_in"]:
         else:
             st.sidebar.error("❌ Invalid credentials. Try again.")
 
-
 # Show App Functionality Only If Logged In
 if st.session_state["logged_in"]:
     # Sidebar Navigation
     st.sidebar.title("📌 Navigation")
     tab = st.sidebar.radio("Go to", ["🏠 Home", "📊 Key Metrics", "💰 Price Analysis", "🔽 Discount Analysis", "⭐ Ratings Analysis", "🔠 Text Analysis"])
 
+    # Logout Button
+    if st.sidebar.button("🚪 Logout"):
+        st.session_state["logged_in"] = False
+        st.sidebar.success("✅ Logged out successfully!")
+        st.rerun()  # Rerun the app to reset the state
 
     # Function to Scrape Data
     def scrape_data(url, n):
