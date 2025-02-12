@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import re
 from collections import Counter
-import time
 
 # Set Page Config
 st.set_page_config(page_title="Flipkart Web Scraper", layout="wide")
@@ -28,29 +27,27 @@ if not st.session_state["logged_in"]:
         else:
             st.sidebar.error("❌ Invalid credentials. Try again.")
 
+
 # Show App Functionality Only If Logged In
 if st.session_state["logged_in"]:
     # Sidebar Navigation
     st.sidebar.title("📌 Navigation")
     tab = st.sidebar.radio("Go to", ["🏠 Home", "📊 Key Metrics", "💰 Price Analysis", "🔽 Discount Analysis", "⭐ Ratings Analysis", "🔠 Text Analysis"])
 
+
     # Function to Scrape Data
     def scrape_data(url, n):
         products = []
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        }
-
         for i in range(1, n + 1):
             page_url = f"{url}&page={i}"
-            try:
-                response = requests.get(page_url, headers=headers)
-                response.raise_for_status()  # Raise an error for bad status codes
-            except requests.exceptions.RequestException as e:
-                st.error(f"❌ Error fetching page {i}: {e}")
+            scraperapi_url = f"http://api.scraperapi.com?api_key=cc8c157a4e6d44504d70e5f4dca7c8b6&url={page_url}"
+            
+            response = requests.get(scraperapi_url)
+
+            if response.status_code != 200:
                 continue
 
-            soup = BeautifulSoup(response.text, "lxml")
+            soup = BeautifulSoup(response.text, "html.parser")
             mine = soup.find("div", class_="DOjaWF gdgoEp")
             product_containers = mine.find_all('div', class_=['tUxRFH', 'slAVV4', '_1sdMkc LFEi7Z']) if mine else []
 
@@ -68,11 +65,11 @@ if st.session_state["logged_in"]:
                     "Ratings": ratings.text.strip() if ratings else None,
                     "MRP(₹)": mrp.text.strip().replace("₹", "").replace(",", "") if mrp else None,
                     "Discount(%)":discount.text.strip().replace("%","").replace("off","") if discount else None,
-                    "No. of Reviews": re.search(r"(\d[\d,]*)\s*Reviews", reviews.text.strip()).group(1).replace(",", "") if reviews and re.search(r"(\d[\d,]*)\s*Reviews", reviews.text.strip()) else "0",
+                    "No. of Reviews": re.search(r"(\d[\d,])\s*Reviews", reviews.text.strip()).group(1).replace(",", "") if reviews and re.search(r"(\d[\d,])\s*Reviews", reviews.text.strip()) else "0",
+
                 }
 
                 products.append(product)
-            time.sleep(1)  # Rate limiting to avoid being blocked
 
         if products:
             df = pd.DataFrame(products)
@@ -88,7 +85,7 @@ if st.session_state["logged_in"]:
     # Home Page
     if tab == "🏠 Home":
         st.title("🛒 Flipkart Web Scraper")
-        st.markdown("### **Enter a Flipkart product URL to scrape product data, including prices, ratings, and reviews.**")
+        st.markdown("### *Enter a Flipkart product URL to scrape product data, including prices, ratings, and reviews.*")
 
         url = st.text_input("🔗 Enter Flipkart Product URL:")
         n = st.number_input("📄 Number of pages to scrape:", min_value=1, max_value=20, value=5, step=1)
@@ -99,7 +96,7 @@ if st.session_state["logged_in"]:
                 df = scrape_data(url, n)
                 if df is not None:
                     st.success("✅ Data scraped successfully!")
-                    st.write("### **All Scraped Data:**")
+                    st.write("### *All Scraped Data:*")
                     st.dataframe(df)  # Shows the entire dataset
 
                     st.session_state["df"] = df  # Save dataframe for later use
