@@ -40,7 +40,7 @@ if st.session_state["logged_in"]:
         products = []
         for i in range(1, n + 1):
             page_url = f"{url}&page={i}"
-            scraperapi_url = f"http://api.scraperapi.com?api_key=cc8c157a4e6d44504d70e5f4dca7c8b6&url={page_url}"
+            scraperapi_url = f"http://api.scraperapi.com?api_key={st.secrets['SCRAPER_API_KEY']}&url={page_url}"
             
             response = requests.get(scraperapi_url)
 
