@@ -82,7 +82,7 @@ if st.session_state["logged_in"]:
             df["MRP(₹)"] = pd.to_numeric(df["MRP(₹)"], errors="coerce", downcast='integer')
             df["Discount(%)"]=pd.to_numeric(df["Discount(%)"],errors="coerce")
             df["No. of Reviews"] = pd.to_numeric(df["No. of Reviews"], errors="coerce", downcast='integer')
-            df.dropna(subset=["Price(₹)"], inplace=True)
+           
             return df
         return None
 
