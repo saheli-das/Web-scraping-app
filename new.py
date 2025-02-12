@@ -92,7 +92,7 @@ if st.session_state["logged_in"]:
         st.markdown("### *Enter a Flipkart product URL to scrape product data, including prices, ratings, and reviews.*")
 
         url = st.text_input("🔗 Enter Flipkart Product URL:")
-        n = st.number_input("📄 Number of pages to scrape:", min_value=1, max_value=20, value=5, step=1)
+        n = st.number_input("📄 Number of pages to scrape:", min_value=1, max_value=20, value=1, step=1)
 
         if st.button("🚀 Scrape Data"):
             if url:
